@@ -40,6 +40,21 @@ const icones: Record<string, React.ComponentType<{ className?: string }>> = {
   "Square": Square,
 }
 
+// **CORREÇÃO DEFINITIVA APLICADA AQUI**
+// Este mapeamento garante que o TailwindCSS encontre e gere todas as classes de cor.
+const colorMap: Record<string, string> = {
+    'bg-purple-500': 'bg-purple-500',
+    'bg-orange-500': 'bg-orange-500',
+    'bg-blue-500': 'bg-blue-500',
+    'bg-green-500': 'bg-green-500',
+    'bg-pink-500': 'bg-pink-500',
+    'bg-indigo-500': 'bg-indigo-500',
+    'bg-yellow-500': 'bg-yellow-500',
+    'bg-red-500': 'bg-red-500',
+    'bg-gray-500': 'bg-gray-500',
+};
+
+
 export function NovaAulaModal({ open, onOpenChange, professores, tiposAula }: NovaAulaModalProps) {
   const [formData, setFormData] = useState({
     data: "",
@@ -56,7 +71,6 @@ export function NovaAulaModal({ open, onOpenChange, professores, tiposAula }: No
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Aqui você implementaria a lógica para salvar a aula
     console.log("Nova aula:", formData)
     alert("Aula criada com sucesso!")
     onOpenChange(false)
@@ -79,11 +93,7 @@ export function NovaAulaModal({ open, onOpenChange, professores, tiposAula }: No
   }
 
   const getIconComponent = (iconName: string) => {
-    const IconComponent = icones[iconName as keyof typeof icones]
-    if (!IconComponent) {
-      return <User className="w-5 h-5" />
-    }
-    return <IconComponent className="w-5 h-5" />
+    return icones[iconName as keyof typeof icones] || User;
   }
 
   return (
@@ -103,31 +113,35 @@ export function NovaAulaModal({ open, onOpenChange, professores, tiposAula }: No
               Tipo de Aula *
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {tiposAula.map((tipo) => (
-                <button
-                  key={tipo.id}
-                  type="button"
-                  onClick={() => handleTipoAulaSelect(tipo.id)}
-                  className={`p-4 border-2 rounded-lg text-center transition-all duration-200 hover:shadow-md ${
-                    selectedTipoAula === tipo.id
-                      ? "border-blue-500 bg-blue-50 shadow-md"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <div className="flex flex-col items-center space-y-2">
-                    <div className={`p-2 rounded-full ${tipo.cor} text-white shadow-sm`}>
-                      {getIconComponent(tipo.icone)}
+              {tiposAula.map((tipo) => {
+                const IconComponent = getIconComponent(tipo.icone);
+                const bgColor = colorMap[tipo.cor] || 'bg-gray-500'; // Usa o mapa de cores
+                return (
+                  <button
+                    key={tipo.id}
+                    type="button"
+                    onClick={() => handleTipoAulaSelect(tipo.id)}
+                    className={`p-4 border-2 rounded-lg text-center transition-all duration-200 hover:shadow-md ${
+                      selectedTipoAula === tipo.id
+                        ? "border-blue-500 bg-blue-50 shadow-md"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center space-y-2">
+                      <div className={`p-2 rounded-full ${bgColor} text-white shadow-sm`}>
+                        <IconComponent className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">
+                        {tipo.nome}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">
-                      {tipo.nome}
-                    </span>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Data e Hora */}
+          {/* Restante do formulário... */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label htmlFor="data" className="block text-sm font-medium text-gray-700 mb-2">
@@ -161,7 +175,6 @@ export function NovaAulaModal({ open, onOpenChange, professores, tiposAula }: No
             </div>
           </div>
 
-          {/* Professor */}
           <div>
             <label htmlFor="professor" className="block text-sm font-medium text-gray-700 mb-2">
               Professor *
@@ -182,7 +195,6 @@ export function NovaAulaModal({ open, onOpenChange, professores, tiposAula }: No
             </select>
           </div>
 
-          {/* Quantidade de Alunos e Valor */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label htmlFor="quantidadeAlunos" className="block text-sm font-medium text-gray-700 mb-2">
@@ -213,7 +225,6 @@ export function NovaAulaModal({ open, onOpenChange, professores, tiposAula }: No
             </div>
           </div>
 
-          {/* Status */}
           <div>
             <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
               Status *
@@ -232,7 +243,6 @@ export function NovaAulaModal({ open, onOpenChange, professores, tiposAula }: No
             </select>
           </div>
 
-          {/* Observações */}
           <div>
             <label htmlFor="observacoes" className="block text-sm font-medium text-gray-700 mb-2">
               Observações
@@ -247,7 +257,6 @@ export function NovaAulaModal({ open, onOpenChange, professores, tiposAula }: No
             />
           </div>
 
-          {/* Botões */}
           <div className="flex justify-end space-x-3 pt-4">
             <Button
               type="button"
